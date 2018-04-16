@@ -1,0 +1,2 @@
+htmlpublisher:1.14
+kubernetes:1.1

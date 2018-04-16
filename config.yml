@@ -1,0 +1,6 @@
+---
+- hosts: master1
+  tasks:
+  - name: "Install Demo"
+    include_role:
+      name: ../kmendez.ocp-security-pipeline-demo

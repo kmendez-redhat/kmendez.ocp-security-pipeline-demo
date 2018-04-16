@@ -1,0 +1,11 @@
+---
+# defaults file for kmendez.ocp-security-pipeline-demo
+openshift_user: "openshift"
+openshift_user_groups: "docker, wheel"
+openshift_creds: "--config=/etc/origin/master/openshift-master.kubeconfig"
+jq_download: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+eap_images:
+  - registry.access.redhat.com/jboss-eap-7/eap70-openshift:latest
+  - registry.access.redhat.com/jboss-eap-7/eap70-openshift:1.3
+eclipse_che_version: 5.22.1
+eclipse_che_branch: 5.22.x
