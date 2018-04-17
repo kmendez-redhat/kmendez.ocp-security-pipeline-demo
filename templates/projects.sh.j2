@@ -30,12 +30,12 @@ done
 
 # Create the PQC Support Project
 oc delete all --all -n pqc-support {{ openshift_creds }} || true
+oc delete limitrange --all -n pqc-support {{ openshift_creds }} || true
 oc delete template pqc-support -n pqc-support {{ openshift_creds }} || true
 oc create -f pqc_templates/pqc_support_template.yml -n pqc-support {{ openshift_creds }} || true
 oc new-app --template=pqc-support -n pqc-support {{ openshift_creds }} || true
 oc start-build --from-file=./sonarqube/Dockerfile bc/sonarqube-custom --follow --wait --namespace=pqc-support {{ openshift_creds }}
 oc expose svc/gogs --port=3000 -n pqc-support {{ openshift_creds }}
-oc expose svc/nexus -n pqc-support {{ openshift_creds }}
 oc expose svc/sonarqube-custom -n pqc-support {{ openshift_creds }}
 
 oc create -f ocp-jenkins/is.yml -n pqc-support {{ openshift_creds }} || true
@@ -44,11 +44,14 @@ oc start-build custom-jenkins-build --follow --wait {{ openshift_creds }} -n pqc
 oc new-app custom-jenkins -n pqc-support {{ openshift_creds }} 
 oc expose svc/custom-jenkins --port=8080 -n pqc-support {{ openshift_creds }} 
 oc set env dc/custom-jenkins -n pqc-support {{ openshift_creds }} JAVA_OPTS=-Dhudson.model.DirectoryBrowserSupport.CSP=\"\" JAVA_GC_OPTS=-XX:MaxMetaspaceSize=256m
+oc set probe dc/custom-jenkins --readiness --failure-threshold=3 --initial-delay-seconds=3  --period-seconds=5 --timeout-seconds=10 {{ openshift_creds }} -n pqc-support --get-url=http://:8080/
 oc adm policy add-role-to-user edit -z default -n pqc-support {{ openshift_creds }}
 
 # Create the PQC Development Project
 oc delete all --all -n pqc-dev {{ openshift_creds }} || true
 oc delete template pqc-dev -n pqc-dev {{ openshift_creds }} || true
+oc adm policy add-role-to-group registry-viewer system:authenticated -n pqc-dev {{ openshift_creds }}
+oc adm policy add-role-to-group registry-viewer system:unauthenticated -n pqc-dev {{ openshift_creds }}
 oc create -f pqc_templates/pqc_dev_template.yml -n pqc-dev {{ openshift_creds }}
 oc new-app --template=pqc-dev -n pqc-dev {{ openshift_creds }} || true
 oc delete route pqc-dev {{ openshift_creds }} -n pqc-dev || true
@@ -71,7 +74,7 @@ oc delete route pqc-prod {{ openshift_creds }} -n pqc-prod || true
 oc expose svc/pqc-prod {{ openshift_creds }} -n pqc-prod
 
 printf "\nWaiting for jenkins pod to start"
-while ! oc get pods -n pqc-support {{ openshift_creds }} | grep custom-jenkins | grep -v build | grep -v deploy | grep Running
+while ! oc get pods -n pqc-support {{ openshift_creds }} | grep custom-jenkins | grep -v build | grep -v deploy | grep "1/1"
 do
 printf "\n."
 sleep 2

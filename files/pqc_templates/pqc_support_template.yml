@@ -56,23 +56,6 @@ objects:
 - apiVersion: v1
   kind: ImageStream
   metadata:
-    labels:
-      app: nexus
-    name: nexus
-  spec:
-    tags:
-    - annotations:
-        openshift.io/imported-from: docker.io/sonatype/nexus3
-      from:
-        kind: DockerImage
-        name: docker.io/sonatype/nexus3
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
     creationTimestamp: null
     generation: 1
     labels:
@@ -186,85 +169,6 @@ objects:
     resources:
       requests:
         storage: "1Gi"
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    labels:
-      app: nexus
-    name: nexus
-  spec:
-    replicas: 1
-    selector:
-      app: nexus
-      deploymentconfig: nexus
-    strategy:
-      activeDeadlineSeconds: 21600
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
-    template:
-      metadata:
-        labels:
-          app: nexus
-          deploymentconfig: nexus
-      spec:
-        containers:
-        - image: docker.io/sonatype/nexus3:latest
-          imagePullPolicy: Always
-          env:
-          - name: INSTALL4J_ADD_VM_PARAMS
-            value: "-Xms1024m -Xmx1024m -XX:MaxDirectMemorySize=1024m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
-          livenessProbe:
-            failureThreshold: 30
-            httpGet:
-              port: 8081
-              scheme: HTTP
-            initialDelaySeconds: 300
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 3
-          name: nexus
-          ports:
-          - containerPort: 8081
-            protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              port: 8081
-              scheme: HTTP
-            initialDelaySeconds: 3
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 10
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          volumeMounts:
-          - mountPath: /sonatype-work
-            name: nexus-volume-1
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: nexus-volume-1
-    test: false
-    triggers:
-    - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - nexus
-        from:
-          kind: ImageStreamTag
-          name: nexus:latest
-          namespace: pqc-support
-      type: ImageChange
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -383,26 +287,6 @@ objects:
     selector:
       app: gogs
       deploymentconfig: gogs
-    sessionAffinity: None
-    type: ClusterIP
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      app: nexus
-    name: nexus
-  spec:
-    ports:
-    - name: 8081-tcp
-      port: 8081
-      protocol: TCP
-      targetPort: 8081
-    selector:
-      app: nexus
-      deploymentconfig: nexus
     sessionAffinity: None
     type: ClusterIP
 - apiVersion: v1
