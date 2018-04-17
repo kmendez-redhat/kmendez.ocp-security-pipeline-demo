@@ -108,13 +108,12 @@
         - oc adm policy add-scc-to-user privileged -z default -n pqc-support
         - oc adm policy add-scc-to-user anyuid  -z default -n pqc-support
       ignore_errors: true
-    - name: Pull Jenkins slave SCAP image
-      git:
-        repo: 'https://github.com/kharyam/jenkins.git'
-        dest: /tmp/scap
     - name: Login to OCP docker repository
       shell: oc login https://{{ inventory_hostname }} -u opentlc-mgr -p 'r3dh4t1!' --insecure-skip-tls-verify && docker login -u $(oc whoami) -p $(oc whoami -t) docker-registry.default.svc:5000
-    
+#    - name: Pull Jenkins slave SCAP image
+#      git:
+#        repo: 'https://github.com/kharyam/jenkins.git'
+#        dest: /tmp/scap    
 #    - name: Build Jenkins slave SCAP image and push into OCP
 #      docker_image:
 #        path: /tmp/scap/slave-scap
@@ -123,7 +122,7 @@
 #        tag: latest
 #        push: yes
 #        state: present
-    - name: Push Jenkins slave SCAP image into repo from docker hub
+    - name: Push Jenkins slave SCAP image into repo from docker hub (Currently cannot build image on this RHPDS cluster)
       docker_image:
         name: docker.io/kharyam/scap-scanner
         repository: docker-registry.default.svc:5000/openshift/scap-slave
