@@ -1,8 +1,8 @@
 #!/bin/bash
 export OPENSHIFT_ENDPOINT=https://{{ inventory_hostname }}
 export OPENSHIFT_TOKEN=$(oc whoami -t)
-#export OPENSHIFT_NAMESPACE_URL=che-eclipse-che.{{ openshift_master_default_subdomain }
-export OPENSHIFT_NAMESPACE_URL=eclipse-che.{{ openshift_master_default_subdomain }
+#export OPENSHIFT_NAMESPACE_URL=che-eclipse-che.{{ openshift_master_default_subdomain }}
+export OPENSHIFT_NAMESPACE_URL=eclipse-che.{{ openshift_master_default_subdomain }}
 export OPENSHIFT_FLAVOR=ocp
 export CHE_IMAGE_TAG={{ eclipse_che_version }}
 
