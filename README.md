@@ -4,8 +4,11 @@ Role Name
 Passwords:
 
 gogs: developer / Welcome1!
+
 Jenkins: admin / password
+
 Nexus: admin / admin123
+
 SonarQube: admin / admin
 
 Requirements
