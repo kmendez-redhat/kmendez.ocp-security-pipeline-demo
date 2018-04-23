@@ -4,8 +4,8 @@ kmendez.ocp-security-pipeline-demo
 After provisioning the RHPDS OCP 3.9 cluster, logon to the bastion and run the following commands:
 
     sudo su -
-    git clone https://github.com/kmendez-redhat/kmendez.ocp-security-pipeline-demo.git
-    cd kmendez.ocp-security-pipeline-demo.git
+    git clone https://github.com/kmendez-redhat/kmendez.ocp-security-pipeline-demo
+    cd kmendez.ocp-security-pipeline-demo
     ansible-playbook config.yml
 
 Passwords:
