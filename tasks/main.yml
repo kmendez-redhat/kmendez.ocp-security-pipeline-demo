@@ -163,14 +163,26 @@
     - name: Delete che limit range
       command: "oc delete limitrange --all -n eclipse-che {{ openshift_creds }}"
       ignore_errors: true
-    - name: Patch che DC, set SCC privileged to true
+    - name: Patch che DC, set SCC privileged 
       command: "oc patch dc/che --patch='{\"spec\": {\"template\": {\"spec\": {\"containers\": [  {\"name\":\"che\",\"securityContext\": { \"privileged\": true }}]}}}}' -n eclipse-che {{ openshift_creds }}"
+    - name: Get che volumes
+      shell: "oc get pvc -n eclipse-che  {{ openshift_creds }} | grep {{ item }} | awk '{print $3}'"
+      register: "r" 
+      with_items: "{{ che_volumes }}"
+    - name: Extract che volumes
+      unarchive:
+        src: "{{ item.item }}.tar.gz"
+        dest: /srv/nfs/user-vols/{{ item.stdout }}
+        group: 0
+        owner: 0
+      delegate_to: "{{ groups['nfs'][0] }}"
+      with_items: "{{ r.results }}"
     - name: Get gogs volume
       shell: "oc get pvc/pvc-gogs -n pqc-support {{ openshift_creds }} | grep pvc-gogs | awk '{print $3}'"
       register: gogs_volume
     - name: "Extract gogs data (user: developer password: Welcome1!)"
       unarchive:
-        src: gogs-pvc.tar.gz
+        src: pvc-gogs.tar.gz
         dest: /srv/nfs/user-vols/{{ gogs_volume.stdout }}
         group: 1000
         owner: 1000

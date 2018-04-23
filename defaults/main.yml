@@ -9,3 +9,7 @@ eap_images:
   - registry.access.redhat.com/jboss-eap-7/eap70-openshift:1.3
 eclipse_che_version: 5.22.1
 eclipse_che_branch: 5.22.x
+che_volumes:
+  - che-data-volume
+  - claim-che-workspace
+
